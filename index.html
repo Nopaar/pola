@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Pattern Lock</title>
+
+  <style>
+    *{
+      margin:0;
+      padding:0;
+      box-sizing:border-box;
+      font-family:Arial, sans-serif;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    html, body{
+      overscroll-behavior:none;
+      touch-action:none;
+    }
+
+    body{
+      background:#111827;
+      color:white;
+      display:flex;
+      justify-content:center;
+      align-items:center;
+      min-height:100vh;
+      flex-direction:column;
+      gap:20px;
+      padding:20px;
+      overflow:hidden;
+    }
+
+    h1{
+      font-size:28px;
+      margin-bottom:10px;
+    }
+
+    .form-box{
+      width:320px;
+      display:flex;
+      flex-direction:column;
+      gap:12px;
+    }
+
+    .form-box input{
+      padding:12px;
+      border:none;
+      border-radius:10px;
+      outline:none;
+      background:#1F2937;
+      color:white;
+      font-size:14px;
+    }
+
+    .form-box input::placeholder{
+      color:#9CA3AF;
+    }
+
+    .form-box input[type="date"]{
+      color:#9CA3AF;
+    }
+
+    .container{
+      position:relative;
+      width:320px;
+      height:320px;
+      touch-action:none;
+    }
+
+    canvas{
+      position:absolute;
+      top:0;
+      left:0;
+      z-index:1;
+    }
+
+    .grid{
+      position:absolute;
+      inset:0;
+      display:grid;
+      grid-template-columns:repeat(3,1fr);
+      grid-template-rows:repeat(3,1fr);
+      z-index:2;
+    }
+
+    .dot{
+      display:flex;
+      justify-content:center;
+      align-items:center;
+    }
+
+    .circle{
+      width:28px;
+      height:28px;
+      border-radius:50%;
+      background:#374151;
+      border:3px solid #9CA3AF;
+      transition:0.2s;
+    }
+
+    .active .circle{
+      background:#3B82F6;
+      border-color:#60A5FA;
+      transform:scale(1.2);
+      box-shadow:0 0 15px #3B82F6;
+    }
+
+    .buttons{
+      display:flex;
+      gap:10px;
+    }
+
+    button{
+      padding:12px 20px;
+      border:none;
+      border-radius:10px;
+      cursor:pointer;
+      font-size:16px;
+      font-weight:bold;
+      transition:0.2s;
+    }
+
+    .save{
+      background:#10B981;
+      color:white;
+    }
+
+    .reset{
+      background:#EF4444;
+      color:white;
+    }
+
+    button:hover{
+      transform:scale(1.05);
+    }
+
+    .pattern-text{
+      margin-top:10px;
+      color:#D1D5DB;
+      text-align:center;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Pola Untuk Kebutuhan Check-Up Teknisi</h1>
+
+  <!-- FORM INPUT -->
+  <div class="form-box">
+    <input type="text" id="namaKonsumen" placeholder="Nama Konsumen">
+    <input type="text" id="merkHp" placeholder="Merk HP">
+    <input type="text" id="namaTeknisi" placeholder="Nama Teknisi">
+    <input type="text" id="kerusakan" placeholder="Kerusakan">
+    <input type="date" id="tanggal">
+  </div>
+
+  <div class="container">
+    <canvas id="canvas" width="320" height="320"></canvas>
+
+    <div class="grid" id="grid">
+      <div class="dot" data-id="1"><div class="circle"></div></div>
+      <div class="dot" data-id="2"><div class="circle"></div></div>
+      <div class="dot" data-id="3"><div class="circle"></div></div>
+
+      <div class="dot" data-id="4"><div class="circle"></div></div>
+      <div class="dot" data-id="5"><div class="circle"></div></div>
+      <div class="dot" data-id="6"><div class="circle"></div></div>
+
+      <div class="dot" data-id="7"><div class="circle"></div></div>
+      <div class="dot" data-id="8"><div class="circle"></div></div>
+      <div class="dot" data-id="9"><div class="circle"></div></div>
+    </div>
+  </div>
+
+  <div class="buttons">
+    <button class="save" id="saveBtn">Save</button>
+    <button class="reset" id="resetBtn">Reset</button>
+  </div>
+
+  <div class="pattern-text">
+    Pattern: <span id="patternResult">-</span>
+  </div>
+
+<script>
+const canvas = document.getElementById("canvas");
+const ctx = canvas.getContext("2d");
+
+const dots = document.querySelectorAll(".dot");
+const patternResult = document.getElementById("patternResult");
+const container = document.querySelector(".container");
+
+let isDrawing = false;
+let pattern = [];
+let positions = {};
+
+function initPositions() {
+  dots.forEach(dot => {
+    const rect = dot.getBoundingClientRect();
+    const parentRect = canvas.getBoundingClientRect();
+
+    positions[dot.dataset.id] = {
+      x: rect.left - parentRect.left + rect.width / 2,
+      y: rect.top - parentRect.top + rect.height / 2
+    };
+  });
+}
+
+initPositions();
+window.addEventListener("resize", initPositions);
+
+function drawLine() {
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+
+  if(pattern.length < 2) return;
+
+  ctx.beginPath();
+  ctx.lineWidth = 6;
+  ctx.strokeStyle = "#3B82F6";
+  ctx.lineCap = "round";
+
+  pattern.forEach((id,index) => {
+    const pos = positions[id];
+
+    if(index === 0){
+      ctx.moveTo(pos.x, pos.y);
+    } else {
+      ctx.lineTo(pos.x, pos.y);
+    }
+  });
+
+  ctx.stroke();
+}
+
+function activateDot(dot){
+  const id = dot.dataset.id;
+
+  if(!pattern.includes(id)){
+    pattern.push(id);
+    dot.classList.add("active");
+    patternResult.textContent = pattern.join("-");
+    drawLine();
+  }
+}
+
+dots.forEach(dot => {
+
+  dot.addEventListener("mousedown", (e) => {
+    e.preventDefault();
+    isDrawing = true;
+    activateDot(dot);
+  });
+
+  dot.addEventListener("mouseenter", () => {
+    if(isDrawing){
+      activateDot(dot);
+    }
+  });
+
+  dot.addEventListener("touchstart", (e) => {
+    e.preventDefault();
+    isDrawing = true;
+    activateDot(dot);
+  }, { passive:false });
+
+});
+
+container.addEventListener("touchmove", (e) => {
+  e.preventDefault();
+
+  if(!isDrawing) return;
+
+  const touch = e.touches[0];
+  const element = document.elementFromPoint(touch.clientX, touch.clientY);
+
+  if(element){
+    const dot = element.closest(".dot");
+
+    if(dot){
+      activateDot(dot);
+    }
+  }
+}, { passive:false });
+
+document.addEventListener("mouseup", () => {
+  isDrawing = false;
+});
+
+document.addEventListener("touchend", () => {
+  isDrawing = false;
+});
+
+document.getElementById("resetBtn").addEventListener("click", () => {
+
+  pattern = [];
+  patternResult.textContent = "-";
+
+  dots.forEach(dot => {
+    dot.classList.remove("active");
+  });
+
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+});
+
+document.getElementById("saveBtn").addEventListener("click", () => {
+
+  const namaKonsumen = document.getElementById("namaKonsumen").value || "Konsumen";
+  const merkHp = document.getElementById("merkHp").value || "HP";
+  const namaTeknisi = document.getElementById("namaTeknisi").value || "Teknisi";
+  const kerusakan = document.getElementById("kerusakan").value || "Kerusakan";
+  const tanggalInput = document.getElementById("tanggal").value;
+
+  let tanggalFormat = "-";
+
+  if(tanggalInput){
+    const dateObj = new Date(tanggalInput);
+
+    const hari = String(dateObj.getDate()).padStart(2, '0');
+    const bulan = String(dateObj.getMonth() + 1).padStart(2, '0');
+    const tahun = dateObj.getFullYear();
+
+    tanggalFormat = `${hari}-${bulan}-${tahun}`;
+  }
+
+  const finalCanvas = document.createElement("canvas");
+  finalCanvas.width = 320;
+  finalCanvas.height = 550;
+
+  const finalCtx = finalCanvas.getContext("2d");
+
+  // Background
+  finalCtx.fillStyle = "#111827";
+  finalCtx.fillRect(0,0,320,550);
+
+  // Judul
+  finalCtx.fillStyle = "white";
+  finalCtx.font = "bold 18px Arial";
+  finalCtx.fillText("DATA SERVICE HP", 70, 35);
+
+  // Data
+  finalCtx.font = "14px Arial";
+  finalCtx.fillText("Nama Konsumen : " + namaKonsumen, 20, 70);
+  finalCtx.fillText("Merk HP       : " + merkHp, 20, 100);
+  finalCtx.fillText("Nama Teknisi  : " + namaTeknisi, 20, 130);
+  finalCtx.fillText("Kerusakan     : " + kerusakan, 20, 160);
+  finalCtx.fillText("Tanggal       : " + tanggalFormat, 20, 190);
+  finalCtx.fillText("Pattern       : " + pattern.join("-"), 20, 220);
+
+  // Geser pattern
+  finalCtx.save();
+  finalCtx.translate(0, 230);
+
+  // Garis pattern
+  finalCtx.drawImage(canvas,0,0);
+
+  // Titik pattern
+  pattern.forEach(id => {
+    const pos = positions[id];
+
+    finalCtx.beginPath();
+    finalCtx.arc(pos.x,pos.y,14,0,Math.PI*2);
+    finalCtx.fillStyle = "#3B82F6";
+    finalCtx.fill();
+  });
+
+  finalCtx.restore();
+
+  // Tambahkan tanggal pada nama file
+  const fileName =
+    `${merkHp}-${kerusakan}-${namaTeknisi}-${tanggalFormat}`
+    .replace(/\s+/g, "_")
+    .replace(/[^\w\-]/g, "") + ".png";
+
+  const link = document.createElement("a");
+  link.download = fileName;
+  link.href = finalCanvas.toDataURL("image/png");
+  link.click();
+});
+</script>
+
+</body>
+</html>
