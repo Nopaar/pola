@@ -1,0 +1,273 @@
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:Arial,sans-serif;
+    -webkit-tap-highlight-color:transparent;
+}
+
+html{
+    font-size:16px;
+    scroll-behavior:smooth;
+}
+
+body{
+    background:#ffffff;
+    min-height:100vh;
+
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+
+    gap:20px;
+
+    padding:20px 15px 40px;
+
+    overflow-x:hidden;
+    overflow-y:auto;
+
+    color:#000;
+}
+
+/* Judul */
+
+h1{
+    width:100%;
+    text-align:center;
+    font-size:clamp(20px,4vw,32px);
+    line-height:1.4;
+    color:#000;
+}
+
+/* Form */
+
+.form-box{
+    width:min(100%,450px);
+
+    display:flex;
+    flex-direction:column;
+
+    gap:12px;
+}
+
+.form-box input{
+    width:100%;
+    height:52px;
+
+    padding:0 15px;
+
+    border:none;
+    outline:none;
+
+    border-radius:12px;
+
+    background:#000;
+    color:#fff;
+
+    font-size:15px;
+}
+
+.form-box input::placeholder{
+    color:#fff;
+}
+
+.form-box input[type="date"]{
+    color:#fff;
+}
+
+/* Pattern Lock */
+
+.container{
+    position:relative;
+
+    width:min(90vw,420px);
+
+    aspect-ratio:1/1;
+
+    margin:auto;
+
+    user-select:none;
+
+    touch-action:none;
+}
+
+canvas{
+    position:absolute;
+    inset:0;
+    width:100%;
+    height:100%;
+    z-index:1;
+    pointer-events:none;
+}
+
+.form-box select{
+    width:100%;
+    height:52px;
+
+    padding:0 15px;
+
+    border:none;
+    outline:none;
+
+    border-radius:12px;
+
+    background:#000;
+    color:#fff;
+
+    font-size:15px;
+
+    cursor:pointer;
+}
+
+.form-box select option{
+    background:#000;
+    color:#fff;
+}
+
+.grid{
+    position:absolute;
+
+    inset:0;
+
+    z-index:2;
+
+    display:grid;
+
+    grid-template-columns:repeat(3,1fr);
+    grid-template-rows:repeat(3,1fr);
+}
+
+.dot{
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    pointer-events:none;
+}
+
+.circle{
+    width:clamp(24px,7vw,36px);
+    height:clamp(24px,7vw,36px);
+
+    border-radius:50%;
+
+    background:#000;
+
+    border:3px solid #9CA3AF;
+
+    transition:.2s;
+}
+
+.active .circle{
+    background:#3B82F6;
+    border-color:#60A5FA;
+
+    transform:scale(1.2);
+
+    box-shadow:0 0 15px #3B82F6;
+}
+
+/* Tombol */
+
+.buttons{
+    width:min(100%,420px);
+
+    display:flex;
+
+    gap:10px;
+}
+
+.buttons button{
+    flex:1;
+
+    height:52px;
+
+    border:none;
+
+    border-radius:12px;
+
+    font-size:16px;
+
+    font-weight:600;
+
+    cursor:pointer;
+
+    transition:.2s;
+}
+
+.save{
+    background:#000;
+    color:#fff;
+}
+
+.reset{
+    background:#EF4444;
+    color:#fff;
+}
+
+button:hover{
+    transform:scale(1.03);
+}
+
+/* Pattern Result */
+
+.pattern-text{
+    width:min(100%,420px);
+
+    text-align:center;
+
+    word-break:break-word;
+
+    color:#000;
+
+    font-size:16px;
+
+    padding-bottom:10px;
+}
+
+/* HP kecil */
+
+@media(max-width:480px){
+
+    body{
+        padding:15px 12px 30px;
+    }
+
+    h1{
+        font-size:22px;
+    }
+
+    .form-box input{
+        height:48px;
+        font-size:14px;
+    }
+
+    .buttons button{
+        height:48px;
+        font-size:14px;
+    }
+
+    .pattern-text{
+        font-size:14px;
+    }
+}
+
+/* Tablet */
+
+@media(min-width:768px){
+
+    .container{
+        width:min(70vw,500px);
+    }
+
+    .form-box{
+        width:min(70vw,500px);
+    }
+
+    .buttons{
+        width:min(70vw,500px);
+    }
+
+    .pattern-text{
+        width:min(70vw,500px);
+    }
+}
