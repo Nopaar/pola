@@ -9,28 +9,34 @@
 </head>
 <body>
 
-    <h1>Pola Untuk Kebutuhan Check-Up Teknisi<br>PRIVASI 1000000% AMAN!<br> </h1>
+<h1>
+Pola Untuk Kebutuhan Check-Up Teknisi<br>
+PRIVASI 1000000% AMAN!
+</h1>
+
+<!-- ❗ INI HARUS MENGUNGGUNG SEMUA AREA -->
+<div id="captureArea">
 
     <div class="form-box">
         <input type="text" id="namaKonsumen" placeholder="Nama Konsumen">
         <input type="text" id="merkHp" placeholder="Merk HP">
-      <select id="namaTeknisi">
-    <option value="">Pilih Teknisi</option>
-    <option value="Candra Lesmana">Candra Lesmana</option>
-    <option value="Maman Rohman Saefudin">Maman Rohman Saefudin</option>
-</select>
+
+        <select id="namaTeknisi">
+            <option value="">Pilih Teknisi</option>
+            <option value="Candra Lesmana">Candra Lesmana</option>
+            <option value="Maman Rohman Saefudin">Maman Rohman Saefudin</option>
+        </select>
+
         <input type="text" id="kerusakan" placeholder="Kerusakan">
-       <input
-    type="date"
-    id="tanggal"
-    onclick="this.showPicker()"
->
+
+        <input type="date" id="tanggal" onclick="this.showPicker()">
     </div>
 
     <div class="container">
-       <canvas id="canvas"></canvas>
+        <canvas id="canvas"></canvas>
 
         <div class="grid" id="grid">
+
             <div class="dot" data-id="1"><div class="circle"></div></div>
             <div class="dot" data-id="2"><div class="circle"></div></div>
             <div class="dot" data-id="3"><div class="circle"></div></div>
@@ -42,33 +48,31 @@
             <div class="dot" data-id="7"><div class="circle"></div></div>
             <div class="dot" data-id="8"><div class="circle"></div></div>
             <div class="dot" data-id="9"><div class="circle"></div></div>
+
         </div>
-    </div>
-
-    <div id="captureArea">
-   <!-- semua form + grid pola ada di sini -->
-</div>
-
-    <div class="buttons">
-        <button class="save" id="saveBtn">Save</button>
-        <button class="reset" id="resetBtn">Reset</button>
     </div>
 
     <div class="pattern-text">
         Pattern: <span id="patternResult">-</span>
     </div>
 
+</div>
+<!-- ❗ END captureArea -->
+
+<div class="buttons">
+    <button class="save" id="saveBtn">Save</button>
+    <button class="reset" id="resetBtn">Reset</button>
+</div>
+
 <footer class="credit">
     Made by
-    <a
-        href="https://instagram.com/alipspakbor"
-        target="_blank"
-        rel="noopener noreferrer"
-    >
+    <a href="https://instagram.com/alipspakbor" target="_blank">
         Alip (@alipspakbor)
     </a>
 </footer>
+
 <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
 <script src="script.js"></script>
+
 </body>
 </html>
