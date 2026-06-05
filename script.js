@@ -311,201 +311,280 @@ document.getElementById("saveBtn").addEventListener(
     "click",
     async () => {
 
-           const namaKonsumen =
-        document.getElementById("namaKonsumen").value || "Konsumen";
+        const namaKonsumen =
+            document.getElementById("namaKonsumen").value || "Konsumen";
 
         const merkHp =
-        document.getElementById("merkHp").value || "HP";
+            document.getElementById("merkHp").value || "HP";
 
         const namaTeknisi =
-        document.getElementById("namaTeknisi").value || "Teknisi";
+            document.getElementById("namaTeknisi").value || "Teknisi";
 
         const kerusakan =
-        document.getElementById("kerusakan").value || "Kerusakan";
+            document.getElementById("kerusakan").value || "Kerusakan";
 
         const tanggalInput =
-        document.getElementById("tanggal").value;
-        if(tanggalInput){
+            document.getElementById("tanggal").value;
+
+        let tanggalFormat = "-";
+
+        if (tanggalInput) {
 
             const d = new Date(tanggalInput);
 
-          tanggalFormat =
-String(d.getDate()).padStart(2,"0")
-+ "_"
-+ String(d.getMonth()+1).padStart(2,"0")
-+ "_"
-+ d.getFullYear();
+            tanggalFormat =
+                String(d.getDate()).padStart(2, "0") +
+                "_" +
+                String(d.getMonth() + 1).padStart(2, "0") +
+                "_" +
+                d.getFullYear();
         }
 
-        const finalCanvas =
-        document.createElement("canvas");
+        const containerRect =
+            container.getBoundingClientRect();
 
-       finalCanvas.width = 320;
-finalCanvas.height = canvas.height + 260;
+        const exportWidth =
+            Math.round(containerRect.width);
+
+        const exportHeight =
+            Math.round(containerRect.height);
+
+        const finalCanvas =
+            document.createElement("canvas");
+
+        finalCanvas.width = exportWidth;
+
+        finalCanvas.height = exportHeight + 240;
 
         const finalCtx =
-        finalCanvas.getContext("2d");
+            finalCanvas.getContext("2d");
+
+        /*
+        =========================
+        HEADER
+        =========================
+        */
 
         finalCtx.fillStyle = "#111827";
-        finalCtx.fillRect(0,0,320,550);
+        finalCtx.fillRect(
+            0,
+            0,
+            exportWidth,
+            finalCanvas.height
+        );
 
-        finalCtx.fillStyle = "white";
-        finalCtx.font = "bold 18px Arial";
+        finalCtx.fillStyle = "#FFFFFF";
+
+        finalCtx.font =
+            "bold 24px Arial";
+
+        finalCtx.textAlign = "center";
 
         finalCtx.fillText(
             "DATA SERVICE HP",
-            70,
-            35
+            exportWidth / 2,
+            40
         );
 
-        finalCtx.font = "14px Arial";
+        finalCtx.textAlign = "left";
+
+        finalCtx.font =
+            "16px Arial";
+
+        let y = 80;
 
         finalCtx.fillText(
             "Nama Konsumen : " + namaKonsumen,
             20,
-            70
+            y
         );
+
+        y += 30;
 
         finalCtx.fillText(
             "Merk HP : " + merkHp,
             20,
-            100
+            y
         );
+
+        y += 30;
 
         finalCtx.fillText(
             "Nama Teknisi : " + namaTeknisi,
             20,
-            130
+            y
         );
+
+        y += 30;
 
         finalCtx.fillText(
             "Kerusakan : " + kerusakan,
             20,
-            160
+            y
         );
+
+        y += 30;
 
         finalCtx.fillText(
             "Tanggal : " + tanggalFormat,
             20,
-            190
+            y
         );
+
+        y += 30;
 
         finalCtx.fillText(
             "Pattern : " + pattern.join("-"),
             20,
-            220
+            y
         );
 
-        finalCtx.save();
+        /*
+        =========================
+        AREA PATTERN
+        =========================
+        */
 
-     finalCtx.translate(0,250);
+        const patternY = 240;
 
-    finalCtx.drawImage(
-    canvas,
-    10,
-    0,
-    300,
-    canvas.height
-);
+        finalCtx.fillStyle = "#F8FAFC";
 
-        pattern.forEach(id => {
+        finalCtx.fillRect(
+            0,
+            patternY,
+            exportWidth,
+            exportHeight
+        );
 
-            const pos = positions[id];
+        /*
+        =========================
+        GARIS PATTERN
+        =========================
+        */
+
+        if (pattern.length > 0) {
+
+            finalCtx.beginPath();
+
+            finalCtx.lineWidth = 6;
+
+            finalCtx.strokeStyle =
+                "#3B82F6";
+
+            finalCtx.lineCap = "round";
+
+            pattern.forEach((id, index) => {
+
+                const pos =
+                    positions[id];
+
+                if (index === 0) {
+
+                    finalCtx.moveTo(
+                        pos.x,
+                        pos.y + patternY
+                    );
+
+                } else {
+
+                    finalCtx.lineTo(
+                        pos.x,
+                        pos.y + patternY
+                    );
+                }
+            });
+
+            finalCtx.stroke();
+        }
+
+        /*
+        =========================
+        SEMUA DOT
+        =========================
+        */
+
+        dots.forEach(dot => {
+
+            const id =
+                dot.dataset.id;
+
+            const pos =
+                positions[id];
+
+            const active =
+                pattern.includes(id);
 
             finalCtx.beginPath();
 
             finalCtx.arc(
                 pos.x,
-                pos.y,
-                14,
+                pos.y + patternY,
+                18,
                 0,
                 Math.PI * 2
             );
 
-            finalCtx.fillStyle = "#fcfdff";
+            finalCtx.fillStyle =
+                active
+                    ? "#3B82F6"
+                    : "#CBD5E1";
 
             finalCtx.fill();
-        });
 
-        finalCtx.restore();
+            if (active) {
 
-        const fileName =
-        `${namaTeknisi}-${merkHp}-${kerusakan}-${tanggalFormat}`
-        .replace(/[<>:"/\\|?*]/g,"")
-        .replace(/\s+/g,"-")
-        + ".png";
+                finalCtx.beginPath();
 
-        finalCanvas.toBlob(async (blob) => {
-
-            if(
-                "showDirectoryPicker" in window
-            ){
-
-                await saveToFolder(
-                    blob,
-                    fileName
+                finalCtx.arc(
+                    pos.x,
+                    pos.y + patternY,
+                    7,
+                    0,
+                    Math.PI * 2
                 );
 
-            }else{
+                finalCtx.fillStyle =
+                    "#FFFFFF";
 
-                const link =
-                document.createElement("a");
-
-                link.download =
-                fileName;
-
-                link.href =
-                URL.createObjectURL(blob);
-
-                link.click();
+                finalCtx.fill();
             }
-
         });
 
+        const fileName =
+            `${namaTeknisi}-${merkHp}-${kerusakan}-${tanggalFormat}`
+                .replace(/[<>:"/\\|?*]/g, "")
+                .replace(/\s+/g, "-")
+                + ".png";
+
+        finalCanvas.toBlob(
+            async (blob) => {
+
+                if (
+                    "showDirectoryPicker" in window
+                ) {
+
+                    await saveToFolder(
+                        blob,
+                        fileName
+                    );
+
+                } else {
+
+                    const link =
+                        document.createElement("a");
+
+                    link.download =
+                        fileName;
+
+                    link.href =
+                        URL.createObjectURL(blob);
+
+                    link.click();
+                }
+
+            },
+            "image/png",
+            1
+        );
     }
 );
-
-
-initPositions();
-
-async function saveToFolder(blob, fileName){
-
-    try{
-
-        if(!dataFolderHandle){
-
-            const rootHandle =
-            await window.showDirectoryPicker({
-                mode:"readwrite"
-            });
-
-            dataFolderHandle =
-            await rootHandle.getDirectoryHandle(
-                "DATA POLA HP TEKNISI",
-                { create:true }
-            );
-        }
-
-        const fileHandle =
-        await dataFolderHandle.getFileHandle(
-            fileName,
-            { create:true }
-        );
-
-        const writable =
-        await fileHandle.createWritable();
-
-        await writable.write(blob);
-
-        await writable.close();
-
-        alert(
-            "Berhasil disimpan:\n" +
-            fileName
-        );
-
-    }catch(err){
-
-        console.error(err);
-    }
-}
